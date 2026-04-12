@@ -25,7 +25,7 @@ exports.onChat = async function({event: z, api: y}){
   if(!m) return;
   const fork = m.includes("foku") || m.includes("🫵");
   if(fork){
-    y.sendMessage("refresh on:\n❤️🩵🩵🩵🩵🩵❤️🩵🌺🌹🌹🩵🍂🌷🍂🌺❤️🩵🍂🌺🩵❤️❤️🩵🍂🌺❤️❤️🩵🌺🌹❤️🩵🩵🌺❤️❤️🌺🩵🍂🍂🩵🍂❤️🍂🍂❤️🍂🌹🌺🍂🩵🍂", t, z.messageID);
+    y.sendMessage("refresh on:\n❤️🩵🩵🩵🩵🩵❤️🩵🌺🌹🌹🩵🍂🌷🍂🌺❤️🩵🍂🌺🩵❤️", t, z.messageID);
     last[t] = n;
   }
 };
