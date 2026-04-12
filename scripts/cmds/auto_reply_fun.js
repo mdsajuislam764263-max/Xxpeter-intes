@@ -18,10 +18,10 @@ module.exports = {
 
     const replyMap = {
 
-      // 😈owner only
-      "Bab": "Yés jan ki koro 😘",
-      "refresh":"❤️❤️❤️❤️❤️❤️❤️❤️🧡💛🤎💖💚🩵💚🩵💖🤎💖🤎🩵💚💚🤎💗🤎💖🩵💚🩵🤎💖",
-      "refresh2":"💛🧡💙💚🩵💚🤎🤎💗🩵💚💚🤎💓🌺🌺🥀🥀🌹🥀🥀🌹🥀🌺🌹🪷🌷🌺🍂🍁🌺",
+      // 🌙 GOOD NIGHT
+      "refresh": "❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️",
+      "refresh1": "🌺🌹🌺🌹🌺❤️🌺❤️🌹🌹❤️🌺🌹❤️🌺🌹🌹🌺🌺❤️",
+      "refresh2": "🖤🩶🤍🩷🩷🩶🖤❤️💛💚💜🤎💜💙🩵💛💛🩶🤍🩶",
 
       // 🌅 MORNING
       "good morning": "সকাল সকাল উঠে কি লাভ? 😒 আবার ঘুমাও 😴",
@@ -29,9 +29,9 @@ module.exports = {
       "gud morning": "এইটা সকাল নাকি দুপুর? 😏",
 
       // 👋 BYE / LEAVE
-      "bye": "যাও 😒 কিন্তু আবার ইনবক্সে ঢুকবা 😏",
-      "goodbye": "এইভাবে গেলে কষ্ট লাগে 😭 কিন্তু যাও 😌",
-      "see you": "দেখা হবে 😎 না হলে আমি খুঁজে নিব 😏",
+      "Bab": "Húú Jan bolo 😘😘",
+      "Single": "Í..👈🏻....akhono.. single 🥺",
+      "@saju islam": "YOU CALL MY BOSS 📞✅ PLEASE WAIT A SECOND 📞😌",
       "later": "ঠিক আছে যাও, আমি বসে থাকলাম 😆",
       "gtg": "ঠিক আছে যাও 😴 কিন্তু ghost দিও না 😒",
       "i am going": "যাও 😏 কিন্তু miss করলে আবার আসবা 😎",
@@ -49,6 +49,11 @@ module.exports = {
       // 😏 ATTITUDE / FUN
       "ki koro": "তোমার কথা ভাবতেছি 😌 বিশ্বাস করো না করলে 😏",
       "what are you doing": "তোমার মেসেজের অপেক্ষায় ছিলাম 😎",
+      "kire": "কিরে না বলে ভাই বল 😒 সম্মান রাখো 😏",
+      "oi": "ওই না বলে নাম ধরে ডাকো 😎",
+      "hello": "হ্যালো 😏 এতদিন পরে মনে পড়লো?",
+      "@everyone": "📢 EVERYONE 📢সবাই একটু চিপা থেকে বের হয়ে গুরুপে আসো😸✅📢",
+      "hey": "এই 😏 ডাক দিলে আসতেই হয় 😎",
 
       // 😂 FUNNY / TROLL
       "bal": "ভদ্র হও 😑 না হলে report খাইবা 😏",
@@ -68,9 +73,9 @@ module.exports = {
       // 😜 RANDOM
       "jaitechi": "যাও 😒 কিন্তু ফিরে আসবা 😏",
       "jaitesi": "ঠিক আছে যাও 😌 কিন্তু ভুলে যাইও না 😎",
-      "ok": "শুধু ok? 😒 এত কষ্ট করে reply দিলাম 😏",
+      "@everyonee": "📢 EVERYONE 📢সবাই একটু চিপা থেকে বের হয়ে গুরুপে আসো😸✅📢",
       "hmm": "hmm না 😒 কিছু বলো properly 😏",
-      "h": "এইটা কি reply নাকি exam? 😆",
+      "": "এইটা কি reply নাকি exam? 😆",
 
       // 🔥 EXTRA SAVAGE
       "tumi ke": "আমি সেই 😎 যাকে ignore করা যায় না 😏",
@@ -78,8 +83,8 @@ module.exports = {
       "bot naki": "না 😎 আমি AI boss 😏",
     };
 
-    const reply = replyMap[refresh];
-    if (!reply) return; "refresh success 😈",
+    const reply = replyMap[text];
+    if (!reply) return;
 
     return message.reply(reply);
   },
