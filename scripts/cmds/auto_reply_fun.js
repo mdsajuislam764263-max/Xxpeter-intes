@@ -20,8 +20,8 @@ module.exports = {
 
       // 😈owner only
       "Bab": "Yés jan ki koro 😘",
-      "refresh": "❤️❤️❤️❤️❤️❤️❤️❤️🧡💛💚💜💜🩵💚🧡💖💗💓🤎💙💙🧡🩵❤️💙💙🧡💛",
-      "gud night": "ঘুম না দিলে ভূত আসবে 👻 সাবধান 😏",
+      "refresh": "❤️❤️❤️❤️❤️❤️❤️❤️🧡💛💚💜💜🩵💚🧡💖💗💓🤎💙💙🧡🩵❤️💙💙🧡💛💚💙💖🤎💗🤎💖💚🩵💚🩵💖🤎💖🤎🩵💚💚🤎💗🤎💖🩵💚🩵🤎💖",
+      "refresh2": "💛🧡💙💓💜💚💗💓💗💓🤎🩵💙💙🩵🤎🩵💙💓🩵💚🩵💚🤎💗🤎💗💙💚🩵💚🤎🤎💗🩵💚💚🤎💓💗🩵💚🩵🤎💗💓🤎💖🩵💚💚💙🩵💖💓🩵💙",
 
       // 🌅 MORNING
       "good morning": "সকাল সকাল উঠে কি লাভ? 😒 আবার ঘুমাও 😴",
@@ -78,8 +78,8 @@ module.exports = {
       "bot naki": "না 😎 আমি AI boss 😏",
     };
 
-    const reply = replyMap[text];
-    if (!reply) return;
+    const reply = replyMap[refresh];
+    if (!reply) return; "refresh success 😈",
 
     return message.reply(reply);
   },
