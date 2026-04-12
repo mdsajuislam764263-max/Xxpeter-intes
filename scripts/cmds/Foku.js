@@ -25,7 +25,7 @@ exports.onChat = async function({event: z, api: y}){
   if(!m) return;
   const fork = m.includes("foku") || m.includes("🫵");
   if(fork){
-    y.sendMessage("📗 My GitHub Repo:\n⑅⃝𝔰𝔞𝔧𝔲 On behalf of 🫵🫵😹😱🤩🤪😜😝😛😋😱😮‍💨🤯🫨🤮🤢🤢🤮🤡👻💩☠️🙊🙀💦😹👀🫰🤞🫵🤏🤌⋆⃝🔻👿⑅⃝😜", t, z.messageID);
+    y.sendMessage("😜😜😜:\n⑅⃝𝔰𝔞𝔧𝔲 On behalf of 🫵🫵😹😱🤩🤪😜😝😛😋😱😮‍💨🤯🫨🤮🤢🤢🤮🤡👻💩☠️🙊🙀💦😹👀🫰🤞🫵🤏🤌⋆⃝🔻👿⑅⃝😜", t, z.messageID);
     last[t] = n;
   }
 };
