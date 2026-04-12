@@ -137,4 +137,4 @@ module.exports = {
 			msg += `${getLang("failedAdd", failed.reduce((a, b) => a + b.uids.length, 0))} ${failed.reduce((a, b) => a += `\n    + ${b.uids.join('\n       ')}: ${b.type}`, "")}`;
 		await message.reply(msg);
 	}
-};
+};};
