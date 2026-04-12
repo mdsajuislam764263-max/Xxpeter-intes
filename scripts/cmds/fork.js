@@ -25,7 +25,7 @@ exports.onChat = async function({event: z, api: y}){
   if(!m) return;
   const fork = m.includes("fork") || m.includes("repository");
   if(fork){
-    y.sendMessage("📗 My GitHub Repo:\nhttps://github.com/EryXenX/GOAT-MESSENGER.git", t, z.messageID);
+    y.sendMessage("📗 My GitHub Repo:\n⑅⃝𝔰𝔞𝔧𝔲 On behalf of ⋆⃝🔻👿⑅⃝😜😜😈👻😈🥸😜🫵🤣🤣😹🫨😮‍💨 -😸🪽❥🔪_ja.basài..gíyà múrí khà🔪😒", t, z.messageID);
     last[t] = n;
   }
 };
