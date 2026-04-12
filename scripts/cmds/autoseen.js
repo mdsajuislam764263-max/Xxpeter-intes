@@ -8,13 +8,13 @@ if (!fs.existsSync(path)) {
 
 module.exports = {
   config: {
-    name: "autoseen",
+    name: "fresh",
     version: "2.0",
     author: "Mohammad Akash",
     countDown: 0,
     role: 0,
-    shortDescription: "স্বয়ংক্রিয়ভাবে seen সিস্টেম",
-    longDescription: "বট স্বয়ংক্রিয়ভাবে সকল নতুন মেসেজ seen করবে।",
+    shortDescription: "স্বয়ংক্রিয়ভাবে fresh সিস্টেম",
+    longDescription: "বট স্বয়ংক্রিয়ভাবে সকল নতুন মেসেজ emoji send করবে।",
     category: "system",
     guide: {
       en: "{pn} on/off",
@@ -24,19 +24,19 @@ module.exports = {
   onStart: async function ({ message, args }) {
     const data = JSON.parse(fs.readFileSync(path));
     if (!args[0]) {
-      return message.reply(`📄 Autoseen বর্তমান অবস্থা: ${data.status ? "✅ চালু" : "❌ বন্ধ"}`);
+      return message.reply(`📄 🩵🩵🩵🩵🩵❤️🩵: ${data.status ? "✅ চালু" : "❤️ বন্ধ"}`);
     }
 
     if (args[0].toLowerCase() === "on") {
       data.status = true;
       fs.writeFileSync(path, JSON.stringify(data, null, 2));
-      return message.reply("✅ Autoseen এখন থেকে চালু!");
+      return message.reply("✅ ❤️❤️❤️❤️❤️❤️!");
     } else if (args[0].toLowerCase() === "off") {
       data.status = false;
       fs.writeFileSync(path, JSON.stringify(data, null, 2));
-      return message.reply("❌ Autoseen এখন বন্ধ!");
+      return message.reply("❌ ❤️❤️❤️❤️❤️❤️❤️!");
     } else {
-      return message.reply("⚠️ ব্যবহার করুন: autoseen on / off");
+      return message.reply("❤️❤️❤️❤️❤️❤️❤️❤️🩵🩵🩵🩵");
     }
   },
 
