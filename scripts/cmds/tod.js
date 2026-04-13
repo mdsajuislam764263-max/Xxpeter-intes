@@ -1,16 +1,10 @@
 module.exports = {
-  config: { name: "slot", role: 0 },
+  config: { name: "tod", role: 0 },
 
   onStart: async ({ message }) => {
-    const items = ["🍎","🍌","🍇"];
-    let r1 = items[Math.floor(Math.random()*3)];
-    let r2 = items[Math.floor(Math.random()*3)];
-    let r3 = items[Math.floor(Math.random()*3)];
-
-    if (r1 === r2 && r2 === r3) {
-      message.reply(`${r1}|${r2}|${r3}\n🎉 JACKPOT!`);
-    } else {
-      message.reply(`${r1}|${r2}|${r3}\nTry again`);
-    }
+    const q = Math.random() > 0.5 
+      ? "Truth: Your secret?"
+      : "Dare: Send emoji 😈";
+    message.reply(q);
   }
 };
