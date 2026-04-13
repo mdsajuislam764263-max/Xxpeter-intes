@@ -1,22 +1,36 @@
-module.exports.config = {
+module.exports = {
+  config: {
     name: "antiout",
-    version: "1.0.0",
-    credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
-    hasPermssion: 1,
-    description: "Turn off antiout",
-    usages: "antiout on/off",
-    commandCategory: "system",
-    cooldowns: 0
+    version: "1.0",
+    role: 1,
+    shortDescription: "Prevent leaving (auto add back)"
+  },
+
+  onStart: async function ({ message, args, globalData }) {
+    const state = args[0];
+    globalData.antiout = state === "on";
+
+    message.reply(`🚪 Anti-Out is now ${state}`);
+  },
+
+  onEvent: async function ({ event, message, api, globalData }) {
+    if (!globalData.antiout) return;
+
+    // detect leave event
+    if (event.logMessageType === "log:unsubscribe") {
+      const leftUser = event.logMessageData.leftParticipantFbId;
+      const author = event.author;
+
+      // skip if admin removed user
+      if (leftUser != author) return;
+
+      try {
+        await api.addUserToGroup(leftUser, event.threadID);
+
+        message.reply(`🚫 You can't leave 😈\nUser re-added!`);
+      } catch (e) {
+        message.reply("❌ Failed to re-add (maybe privacy settings)");
+      }
+    }
+  }
 };
-
-module.exports.run = async({ api, event, Threads}) => {
-    let data = (await Threads.getData(event.threadID)).data || {};
-    if (typeof data["antiout"] == "undefined" || data["antiout"] == false) data["antiout"] = true;
-    else data["antiout"] = false;
-    
-    await Threads.setData(event.threadID, { data });
-    global.data.threadData.set(parseInt(event.threadID), data);
-    
-    return api.sendMessage(`✅ Done ${(data["antiout"] == true) ? "turn on" : "Turn off"} successful antiout!`, event.threadID);
-
-}
