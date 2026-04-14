@@ -14,7 +14,7 @@
     "notesLanguage": "change language using ISO 639-1 code",
     "nickNameBot": "—͞»̶̶͓͓͓̽̽̽⑅⃝꧁𓊈𒆜m̷a̷r̷i̷𒆜𓊉꧂⋆⃝🔻👿⑅⃝😸🪽❥",
     "prefix": ".",
-    "adminOnly": true,
+    "adminOnly": {
         "enable": true,
         "ignoreCommand": []
     },
