@@ -1,42 +1,52 @@
-const fs = require("fs-extra");
-const path = require("path");
 const axios = require("axios");
+const fs = require("fs");
 
 module.exports = {
   config: {
     name: "say",
-    version: "2.0.0",
-    author: "MOHAMMAD AKASH",
-    countDown: 5,
+    version: "2.0",
     role: 0,
-    shortDescription: "Google TTS দিয়ে ভয়েসে টেক্সট বলা",
-    longDescription: "যেকোনো টেক্সটকে বাংলায় Google Translate এর ভয়েসে রূপান্তর করে পাঠাবে।",
-    category: "media",
-    guide: {
-      en: "{p}say <text>"
-    }
+    shortDescription: "Better free voice"
   },
 
-  onStart: async function ({ api, event, args }) {
+  onStart: async function ({ message, args }) {
+    const lang = args[0]; // bn / en
+    const text = args.slice(1).join(" ");
+
+    if (!text) {
+      return message.reply(
+        "❌ Use:\n.say bn আমি তোমাকে ভালোবাসি 💖\n.say en Hello baby 😘"
+      );
+    }
+
     try {
-      const text = args.join(" ") || (event.messageReply?.body ?? null);
-      if (!text) return api.sendMessage("❌ দয়া করে কিছু লিখুন যেটা ভয়েসে বলতে হবে।", event.threadID, event.messageID);
+      const tl = (lang === "bn") ? "bn" : "en";
 
-      const filePath = path.join(__dirname, "cache", `${event.senderID}.mp3`);
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=bn&client=tw-ob`;
+      // small trick: add pauses for natural feel
+      const betterText = text
+        .replace(/\./g, "... ")
+        .replace(/,/g, ", ")
+        .replace(/!/g, "! ");
 
-      // 🔽 MP3 ফাইল ডাউনলোড
-      const response = await axios.get(url, { responseType: "arraybuffer" });
-      fs.writeFileSync(filePath, Buffer.from(response.data, "utf-8"));
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(betterText)}&tl=${tl}&client=tw-ob`;
 
-      // 🎧 পাঠানো
-      await api.sendMessage({ attachment: fs.createReadStream(filePath) }, event.threadID, () => {
-        fs.unlinkSync(filePath); // 🧹 ফাইল মুছে ফেলা
+      const res = await axios.get(url, {
+        responseType: "arraybuffer",
+        headers: {
+          "User-Agent": "Mozilla/5.0"
+        }
       });
 
-    } catch (error) {
-      console.error("Say command error:", error);
-      api.sendMessage("❌ কিছু সমস্যা হয়েছে। পরে আবার চেষ্টা করুন!", event.threadID);
+      const filePath = "./cache/betterVoice.mp3";
+      fs.writeFileSync(filePath, res.data);
+
+      await message.reply({
+        body: "🎤 Better Voice Ready 😍",
+        attachment: fs.createReadStream(filePath)
+      });
+
+    } catch (e) {
+      message.reply("❌ Voice error (VPN try koro)");
     }
   }
 };
