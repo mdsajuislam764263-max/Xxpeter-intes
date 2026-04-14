@@ -7,7 +7,7 @@ module.exports = {
     name: "help",
     aliases: ["menu", "commands"],
     version: "5.0",
-    author: "admin",
+    author: "EryXenX",
     shortDescription: "Show all commands",
     longDescription: "Show all commands in fancy font with boxes",
     category: "system",
@@ -77,13 +77,11 @@ module.exports = {
     const formatCommandsBox = (cmds) =>
       cmds.sort().map(c => `│  │ ⎙ ${fancyFont(c)}`).join("\n");
 
-    let msg = `│\n│  ${fancyFont("│   ⚠ SYSTEM ACCESS GRANTED ⚠  │
-└──────────────────────────────┘
+    let msg = `│\n│  ${fancyFont("COMMANDS MENU")}\n│  ───────────────\n`;
+    msg += `│  ${fancyFont("PREFIX")} : ${prefix}\n`;
+    msg += `│  ${fancyFont("TOTAL")}  : ${allCommands.size}\n`;
+    msg += `│  ${fancyFont("AUTHOR")} : ⑅⃝𝔰𝔞𝔧𝔲⋆⃝🔻👿⑅⃝😸🪽❥\n│\n`;
 
-> USER: ${adminName}
-> STATUS: ONLINE
-> ACCESS: ROOT ADMIN
-> SYSTEM TIME: ${new Date().toLocaleTimeString()}
     for (const cat of Object.keys(categories)) {
       msg += `│  ┌─ ${categoryFont(cat.toUpperCase())} ─┐\n`;
       msg += formatCommandsBox(categories[cat]) + "\n";
@@ -93,7 +91,7 @@ module.exports = {
     msg += `│  𝐔𝐒𝐄 : ${prefix}help <command>\n│`;
 
     const gifURLs = [
-      "https://i.imgur.com/zYIlgBl.jpg",
+      "https://i.imgur.com/Xw6JTfn.gif",
       "https://i.imgur.com/mW0yjZb.gif",
       "https://i.imgur.com/KQBcxOV.gif"
     ];
