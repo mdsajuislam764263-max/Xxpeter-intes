@@ -9,7 +9,7 @@
         "intervalGetNewCookie": 1440,
         "notes": "Automatically retrieves new cookies every x minutes. Recommended: 1440 (1 day)."
     },
-    "antiInbox": false,
+    "antiInbox": true,
     "language": "en",
     "notesLanguage": "change language using ISO 639-1 code",
     "nickNameBot": "—͞»̶̶͓͓͓̽̽̽⑅⃝꧁𓊈𒆜m̷a̷r̷i̷𒆜𓊉꧂⋆⃝🔻👿⑅⃝😸🪽❥",
@@ -41,7 +41,7 @@
         "notes": "If enabled, only IDs in whiteListIds can use the bot."
     },
     "whiteListModeThread": {
-        "enable": false,
+        "enable": true,
         "whiteListThreadIds": [],
         "notes": "If enabled, only threads in whiteListThreadIds can use the bot."
     },
@@ -91,7 +91,7 @@
         "notes": "Time in seconds. Recommended for uptime monitors."
     },
     "autoLoadScripts": {
-        "enable": false,
+        "enable": true,
         "ignoreCmds": "",
         "ignoreEvents": "",
         "notes": "Automatically reloads scripts if edited."
@@ -124,7 +124,7 @@
     },
     "hideNotiMessage": {
         "commandNotFound": false,
-        "adminOnly": false,
+        "adminOnly": true,
         "threadBanned": false,
         "userBanned": false,
         "needRoleToUseCmd": false,
@@ -155,7 +155,7 @@
         "notes": "Docs: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions"
     },
     "noPrefix": {
-        "enable": false,
+        "enable": true,
         "notes": "true = only bot admins can use commands without prefix | false = everyone must use prefix"
     }
 }
