@@ -1,38 +1,35 @@
-name: Node.js CI
+name: 🤖 Run Messenger Bot
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-
     steps:
-    - name: Checkout Code
+    - name: 📥 Checkout Code
       uses: actions/checkout@v3
 
-    - name: Setup Node.js
+    - name: ⚙️ Setup Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 20
 
-    - name: Install Dependencies
-      run: npm install
-
-    # 🔥 Auto Restart Loop
-    - name: Run Bot (Auto Restart)
+    - name: 📦 Install Dependencies
       run: |
-        while true
+        npm install
+        npm install dotenv
+
+    - name: 🚀 Start Bot (Auto Restart Loop)
+      run: |
+        echo "🔥 Bot Starting..."
+        for i in {1..100}
         do
-          echo "🚀 Starting Bot..."
+          echo "🔁 Restart #$i"
           npm start
-          echo "❌ Bot crashed! Restarting in 5 seconds..."
+          echo "❌ Crashed! Restarting in 5s..."
           sleep 5
         done
