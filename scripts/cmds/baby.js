@@ -15,7 +15,7 @@ const typing = async (api, threadID, ms = 3000) => {
 module.exports = {
   config: {
     name: "baby",
-    aliases: ["mari", "Hinata", "hippi", "xan", "bby", "Bab"],
+    aliases: ["bb", "Hinata", "hippi", "xan", "bby", "Bab"],
     version: "3.6",
     author: "rX (fixed by GPT)",
     countDown: 0,
