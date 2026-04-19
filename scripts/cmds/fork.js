@@ -1,14 +1,14 @@
 exports.config = {
-  name: "fork",
+  name: "rules",
   version: "5.0",
   author: "MOHAMMAD AKASH",
   countDown: 0,
   role: 0,
-  shortDescription: "Fork Link",
-  longDescription: "Responds with GitHub repo link when 'fork' or 'repository' is mentioned. Cooldown: 10 seconds.",
+  shortDescription: "send images",
+  longDescription: "Responds rules image send fast. Cooldown: 10 seconds.",
   category: "system",
   guide: {
-    en: "Type 'fork' or 'repository'"
+    en: "Type 'Rules' or 'rules'"
   }
 };
 
@@ -23,9 +23,9 @@ exports.onChat = async function({event: z, api: y}){
   if(last[t] && n - last[t] < cool) return;
   const m = (z.body || "").toLowerCase().trim();
   if(!m) return;
-  const fork = m.includes("fork") || m.includes("repository");
+  const rules = m.includes("Rules") || m.includes("rules");
   if(fork){
-    y.sendMessage("📗:\n⑅⃝𝔰𝔞𝔧𝔲 On behalf of ⋆⃝🔻👿⑅⃝😜😜😈👻😈🥸😜🫵🤣🤣😹🫨😮‍💨 -😸🪽❥🔪_ja.basài..gíyà múrí khà🔪😒", t, z.messageID);
+    y.sendattachment("📗:\nhttps://i.supaimg.com/5a6fa6f6-f640-4904-a88d-3866f9dac96e/d4dc94a7-4a67-4e9f-9637-91762b2359d4.jpg", t, z.messageID);
     last[t] = n;
   }
 };
