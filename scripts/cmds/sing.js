@@ -1,66 +1,96 @@
-const A = require("axios");
-const B = require("fs-extra");
-const C = require("path");
-const S = require("yt-search");
-
-const p = C.join(__dirname, "cache", `${Date.now()}.mp3`);
-
-const nix = "https://raw.githubusercontent.com/aryannix/stuffs/master/raw/apis.json";
+const axios = require("axios");
+const fs = require("fs-extra");
+const path = require("path");
 
 module.exports = {
   config: {
     name: "sing",
-    aliases: ["song", "music", "play"],
-    version: "0.0.1",
-    author: "ArYAN",
-    countDown: 10,
+    aliases: ["song", "music"],
+    version: "1.1",
+    author: "Neoaz 🐊",
+    countDown: 5,
     role: 0,
-    category: "media"
+    shortDescription: { en: "Search and download YouTube audio" },
+    category: "media",
+    guide: { en: "{pn} <song name>" }
   },
 
-  onStart: async function ({ api, event, args }) {
-    const { threadID: t, messageID: m } = event;
-    const q = args.join(" ");
-    if (!q) return api.sendMessage("❌ Please provide a song name or link.", t, m);
-
-    api.setMessageReaction("⏳", m, () => {}, true);
+  onStart: async function ({ message, args, event, api, commandName }) {
+    const query = args.join(" ");
+    if (!query) return message.reply("Please provide a song name.");
 
     try {
-      const D = await A.get(nix);
-      const E = D.data.api;
-      
-      let u = q;
-      if (!q.startsWith("http")) {
-        const r = await S(q);
-        const v = r.videos[0];
-        if (!v) throw new Error("Error ytdl issue 🧘");
-        u = v.url;
+      const res = await axios.get(`https://neokex-dlapis.vercel.app/api/search?q=${encodeURIComponent(query)}`);
+      const results = res.data.results.slice(0, 6);
+
+      if (results.length === 0) return message.reply("No songs found.");
+
+      let msg = "";
+      const attachments = [];
+      const cacheDir = path.join(__dirname, "cache");
+      await fs.ensureDir(cacheDir);
+
+      for (let i = 0; i < results.length; i++) {
+        msg += `${i + 1}. ${results[i].title}\n[${results[i].duration}]\n\n`;
+        const imgPath = path.join(cacheDir, `sing_${Date.now()}_${i}.jpg`);
+        const imgRes = await axios.get(results[i].thumbnail, { responseType: "arraybuffer" });
+        await fs.writeFile(imgPath, Buffer.from(imgRes.data));
+        attachments.push(fs.createReadStream(imgPath));
       }
 
-      const F = await A.get(`${E}/ytdl`, {
-        params: { url: u, type: "audio" }
+      message.reply({ body: msg.trim(), attachment: attachments }, (err, info) => {
+        global.GoatBot.onReply.set(info.messageID, {
+          commandName,
+          author: event.senderID,
+          results
+        });
+        attachments.forEach(s => setTimeout(() => fs.remove(s.path).catch(() => {}), 10000));
+      });
+    } catch (e) {
+      message.reply("Search error.");
+    }
+  },
+
+  onReply: async function ({ message, event, Reply, api }) {
+    const choice = parseInt(event.body);
+    if (isNaN(choice) || choice < 1 || choice > Reply.results.length) return;
+
+    const selected = Reply.results[choice - 1];
+    api.unsendMessage(event.messageReply.messageID);
+    api.setMessageReaction("⏳", event.messageID);
+
+    try {
+      const dlRes = await axios.get(`https://neokex-dlapis.vercel.app/api/alldl?url=${encodeURIComponent(selected.url)}`);
+      const pollUrl = dlRes.data.audio.downloadUrl;
+
+      let streamUrl = null;
+      for (let i = 0; i < 60; i++) {
+        const statusRes = await axios.get(pollUrl);
+        if (statusRes.data.status === "completed") {
+          streamUrl = statusRes.data.viewUrl;
+          break;
+        }
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      if (!streamUrl) throw new Error("Processing timeout.");
+
+      const cacheDir = path.join(__dirname, "cache");
+      const filePath = path.join(cacheDir, `${Date.now()}.mp3`);
+      
+      const fileRes = await axios.get(streamUrl, { responseType: "arraybuffer" });
+      await fs.writeFile(filePath, Buffer.from(fileRes.data));
+
+      await message.reply({
+        body: selected.title,
+        attachment: fs.createReadStream(filePath)
       });
 
-      if (!F.data.status || !F.data.downloadUrl) throw new Error("API Error");
-
-      const DL = F.data.downloadUrl;
-      const title = F.data.title || "Song";
-
-      const res = await A.get(DL, { responseType: "arraybuffer" });
-      await B.outputFile(p, Buffer.from(res.data));
-
-      api.setMessageReaction("✅", m, () => {}, true);
-
-      return api.sendMessage({
-        body: `🎵 Title: ${title}`,
-        attachment: B.createReadStream(p)
-      }, t, () => {
-        if (B.existsSync(p)) B.unlinkSync(p);
-      }, m);
-
+      api.setMessageReaction("✅", event.messageID);
+      fs.remove(filePath).catch(() => {});
     } catch (e) {
-      api.setMessageReaction("❌", m, () => {}, true);
-      return api.sendMessage(`❌ Error: ${e.message}`, t, m);
+      api.setMessageReaction("❌", event.messageID);
+      message.reply("Download error.");
     }
   }
 };
