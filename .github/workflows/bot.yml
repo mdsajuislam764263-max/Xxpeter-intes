@@ -1,19 +1,16 @@
-name: Bot Runner 24/7 (Limited)
+name: Run Messenger Bot
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-  schedule:
-    - cron: "*/30 * * * *"   # প্রতি 30 মিনিটে trigger
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 360   # max 6 hours
 
     steps:
-    - name: Checkout
+    - name: Checkout Code
       uses: actions/checkout@v3
 
     - name: Setup Node.js
@@ -24,11 +21,5 @@ jobs:
     - name: Install Dependencies
       run: npm install
 
-    - name: Run Bot (auto restart loop)
-      run: |
-        while true; do
-          echo "Starting bot..."
-          node index.js
-          echo "Bot crashed! Restarting in 5s..."
-          sleep 5
-        done
+    - name: Start Bot
+      run: node index.js
