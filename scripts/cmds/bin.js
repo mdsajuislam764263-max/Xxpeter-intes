@@ -1,63 +1,50 @@
-const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
-
-module.exports = {
-  config: {
-    name: "pastebin",
-    aliases: ["bin"],
-    version: "1.4",
-    author: "NeoKEX", // Don't try to change the author name otherwise I'll fvckyourmom
-    countDown: 5,
-    role: 0,
-    shortDescription: "Upload a command's code to Pastebin.",
-    longDescription: "Uploads the raw source code of any command to a Pastebin service and returns the raw link.",
-    category: "utility",
-    guide: "{pn} <commandName}"
-  },
-
-  onStart: async function ({ api, event, args, message }) {
-    // Copyright: NeoKEX
-    const encodedAuthor = 'TmVvS0VY'; 
-    const correctAuthor = Buffer.from(encodedAuthor, 'base64').toString('utf8');
-
-    if (this.config.author !== correctAuthor) {
-      return message.reply("❌ | The author name has been changed. This command will not work.");
-    }
-
-    const cmdName = args[0];
-    if (!cmdName) {
-      return message.reply("❌ | Please provide the command name to upload.");
-    }
-
-    const cmdPath = path.join(__dirname, `${cmdName}.js`);
-
-    if (!fs.existsSync(cmdPath) || !cmdPath.startsWith(__dirname)) {
-      return message.reply(`❌ | Command "${cmdName}" not found in this folder.`);
-    }
-
-    try {
-      const code = fs.readFileSync(cmdPath, "utf8");
-      
-      const encodedApiKey = 'aHR0cHM6Ly9hcnlhbmFwaS51cC5yYWlsd2F5LmFwcC9hcGkvcGFzdGViaW4=';
-      const apiUrl = Buffer.from(encodedApiKey, 'base64').toString('utf8');
-
-      const response = await axios.get(apiUrl, {
-        params: {
-          content: code,
-          title: `${cmdName}.js source code`
-        }
-      });
-
-      const { status, raw } = response.data;
-      if (status === 0 && raw) {
-        return message.reply(`✅ | Raw source code link for "${cmdName}.js":\n🔗 Raw Link: ${raw}`);
-      } else {
-        return message.reply(`❌ | Failed to upload content to Pastebin. Please try again later.`);
-      }
-    } catch (error) {
-      console.error(error);
-      return message.reply("❌ | An error occurred while trying to read and upload the command file.");
-    }
-  }
+Install bin.js const fs = require("fs"),
+	path = require("path"),
+	axios = require("axios");
+module.exports.config = {
+	name: "bin",
+	version: "1.0",
+	hasPermssion: 2,
+	credits: "Shaon Ahmed",
+	description: "Upload local command files to a pastebin service.",
+	commandCategory: "utility",
+	usages: "[filename]",
+	cooldowns: 5
+}, module.exports.run = async function({
+	api: e,
+	event: s,
+	args: a
+}) {
+	if (0 === a.length) return e.sendMessage("📁 অনুগ্রহ করে ফাইলের নাম দিন।\nব্যবহার: pastebin <filename>", s.threadID, s.messageID);
+	const n = a[0],
+		r = path.join(__dirname, "..", "commands"),
+		t = path.join(r, n),
+		o = path.join(r, n + ".js");
+	let i;
+	if (fs.existsSync(t)) i = t;
+	else {
+		if (!fs.existsSync(o)) return e.sendMessage("❌ `commands` ফোল্ডারে ফাইলটি খুঁজে পাওয়া যায়নি।", s.threadID, s.messageID);
+		i = o
+	}
+	fs.readFile(i, "utf8", (async (a, n) => {
+		if (a) return console.error("❗ Read error:", a), e.sendMessage("❗ ফাইলটি পড়তে সমস্যা হয়েছে।", s.threadID, s.messageID);
+		try {
+			e.sendMessage("📤 ফাইল আপলোড হচ্ছে PasteBin-এ, অনুগ্রহ করে অপেক্ষা করুন...", s.threadID, (async (a, r) => {
+				if (a) return console.error(a);
+				const t = "https://pastebin-api.vercel.app",
+					o = await axios.post(`${t}/paste`, {
+						text: n
+					});
+				if (setTimeout((() => {
+						e.unsendMessage(r.messageID)
+					}), 1e3), o.data && o.data.id) {
+					const a = `${t}/raw/${o.data.id}`;
+					return e.sendMessage(`✅ ফাইল সফলভাবে আপলোড হয়েছে:\n🔗 ${a}`, s.threadID)
+				}
+				return console.error("⚠️ Unexpected API response:", o.data), e.sendMessage("⚠️ আপলোড ব্যর্থ হয়েছে। PasteBin সার্ভার থেকে সঠিক আইডি পাওয়া যায়নি।", s.threadID)
+			}))
+		} catch (a) {
+			return console.error("❌ Upload error:", a), e.sendMessage("❌ ফাইল আপলোড করতে সমস্যা হয়েছে:\n" + a.message, s.threadID)
+		}
+	}))
 };
