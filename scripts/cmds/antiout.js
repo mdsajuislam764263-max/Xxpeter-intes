@@ -1,66 +1,59 @@
+let antioutStatus = false;
+
 module.exports = {
-  config: {
-    name: "antiout",
-    version: "6.0",
-    author: "Hasan X",
-    role: 0,
-    shortDescription: "Full Fix Anti Leave",
-    category: "boxchat",
-    guide: "{pn} on/off"
+  name: "antiout",
+
+  run: async function ({ api, event }) {
+
+    const senderID = event.senderID;
+    const threadID = event.threadID;
+    const msg = event.body.toLowerCase();
+
+    // 🔒 Admin only (optional check)
+    const OWNER = process.env.OWNER_ID;
+    if (senderID != OWNER) {
+      return api.sendMessage("⛔ Only admin can use this!", threadID);
+    }
+
+    // ⚙️ ON/OFF system
+    if (msg === "antiout on") {
+      antioutStatus = true;
+      return api.sendMessage("✅ AntiOut Enabled", threadID);
+    }
+
+    if (msg === "antiout off") {
+      antioutStatus = false;
+      return api.sendMessage("❌ AntiOut Disabled", threadID);
+    }
   },
 
-  onStart: async function ({ message, event, threadsData, args }) {
-    if (!args[0]) return message.reply("Use: antiout on/off");
+  // 🔥 Event listener (important)
+  handleEvent: async function ({ api, event }) {
 
-    const status = args[0] === "on";
-    await threadsData.set(event.threadID, status, "settings.antiout");
+    if (!antioutStatus) return;
 
-    return message.reply(`🐸 Antiout ${status ? "Enabled" : "Disabled"}`);
-  },
+    if (event.type === "event" && event.logMessageType === "log:unsubscribe") {
 
-  onEvent: async function ({ api, event, threadsData, usersData }) {
-    if (event.logMessageType !== "log:unsubscribe") return;
+      const leftUID = event.logMessageData.leftParticipantFbId;
+      const threadID = event.threadID;
 
-    const status = await threadsData.get(event.threadID, "settings.antiout");
-    if (!status) return;
+      // bot নিজে remove হলে skip
+      if (leftUID == api.getCurrentUserID()) return;
 
-    const leftID = event.logMessageData.leftParticipantFbId;
-    const botID = api.getCurrentUserID();
+      // notify
+      api.sendMessage(
+        `⚠️ User left the group\nUID: ${leftUID}\nTrying to add back...`,
+        threadID
+      );
 
-    if (leftID == botID) return;
-
-    setTimeout(async () => {
-      try {
-        await api.addUserToGroup(leftID, event.threadID);
-
-        const name = await usersData.getName(leftID);
-
-        api.sendMessage({
-          body: `@${name} পালাইতে গেছিলি? আবার ধইরা আনলাম 😹\n👉 হাসানের পারমিশন ছাড়া lift নেয়া যাবে না 🐸✌️`,
-          mentions: [{
-            tag: name,
-            id: leftID
-          }]
-        }, event.threadID);
-
-      } catch (e) {
-        // যদি add না হয় → invite link
-        try {
-          const threadInfo = await api.getThreadInfo(event.threadID);
-          const inviteLink = threadInfo.inviteLink.enable 
-            ? threadInfo.inviteLink.link 
-            : "Invite link off";
-
-          const name = await usersData.getName(leftID);
-
-          api.sendMessage(
-            `😹 @${name} পালাইতে পারবি না!\nএই লিংক দিয়া আবার ঢুক 👇\n${inviteLink}`,
-            event.threadID
-          );
-        } catch (err) {
-          console.log("Antiout Error:", err);
+      // re-add চেষ্টা
+      api.addUserToGroup(leftUID, threadID, (err) => {
+        if (err) {
+          api.sendMessage("❌ Could not re-add user.", threadID);
+        } else {
+          api.sendMessage("✅ User added back!", threadID);
         }
-      }
-    }, 5000);
+      });
+    }
   }
 };
