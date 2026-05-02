@@ -1,64 +1,66 @@
 module.exports = {
- config: {
- name: "antiout",
- version: "1.0",
- author: "Chitron Bhattacharjee",
- countDown: 5,
- role: 1, // Only admin can use this command
- shortDescription: {
- en: "Prevent members from leaving the group"
- },
- longDescription: {
- en: "Enable/disable anti-out feature that automatically adds back members who leave the group"
- },
- category: "admin",
- guide: {
- en: "{pn} [on|off] - Turn anti-out feature on or off"
- }
- },
+  config: {
+    name: "antiout",
+    version: "6.0",
+    author: "Hasan X",
+    role: 0,
+    shortDescription: "Full Fix Anti Leave",
+    category: "boxchat",
+    guide: "{pn} on/off"
+  },
 
- langs: {
- en: {
- turnedOn: "🛡️ Anti-out feature has been enabled for this group",
- turnedOff: "🛡️ Anti-out feature has been disabled for this group",
- missingPermission: "❌ Sorry boss! I couldn't add the user back.\nUser %1 might have blocked me or doesn't have messenger option enabled.",
- addedBack: "⚠️ Attention %1!\nThis group belongs to my boss!\nYou need admin clearance to leave this group!"
- }
- },
+  onStart: async function ({ message, event, threadsData, args }) {
+    if (!args[0]) return message.reply("Use: antiout on/off");
 
- onStart: async function ({ args, message, event, threadsData, getLang }) {
- if (args[0] === "on") {
- await threadsData.set(event.threadID, true, "data.antiout");
- message.reply(getLang("turnedOn"));
- } 
- else if (args[0] === "off") {
- await threadsData.set(event.threadID, false, "data.antiout");
- message.reply(getLang("turnedOff"));
- }
- else {
- message.reply("Please specify 'on' or 'off' to enable/disable anti-out feature");
- }
- },
+    const status = args[0] === "on";
+    await threadsData.set(event.threadID, status, "settings.antiout");
 
- onEvent: async function ({ event, api, threadsData, usersData, getLang }) {
- if (event.logMessageType !== "log:unsubscribe") 
- return;
+    return message.reply(`🐱 Antiout ${status ? "Enabled" : "Disabled"}`);
+  },
 
- const antiout = await threadsData.get(event.threadID, "data.antiout");
- if (!antiout) 
- return;
+  onEvent: async function ({ api, event, threadsData, usersData }) {
+    if (event.logMessageType !== "log:unsubscribe") return;
 
- if (event.logMessageData.leftParticipantFbId === api.getCurrentUserID()) 
- return;
+    const status = await threadsData.get(event.threadID, "settings.antiout");
+    if (!status) return;
 
- const name = await usersData.getName(event.logMessageData.leftParticipantFbId);
- 
- try {
- await api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID);
- api.sendMessage(getLang("addedBack", name), event.threadID);
- } 
- catch (error) {
- api.sendMessage(getLang("missingPermission", name), event.threadID);
- }
- }
+    const leftID = event.logMessageData.leftParticipantFbId;
+    const botID = api.getCurrentUserID();
+
+    if (leftID == botID) return;
+
+    setTimeout(async () => {
+      try {
+        await api.addUserToGroup(leftID, event.threadID);
+
+        const name = await usersData.getName(leftID);
+
+        api.sendMessage({
+          body: `@${name} পালাইতে গেছিলি? আবার ধইরা আনলাম 😹\n🐱🐱🐱Méøw🐱`,
+          mentions: [{
+            tag: name,
+            id: leftID
+          }]
+        }, event.threadID);
+
+      } catch (e) {
+        // যদি add না হয় → invite link
+        try {
+          const threadInfo = await api.getThreadInfo(event.threadID);
+          const inviteLink = threadInfo.inviteLink.enable 
+            ? threadInfo.inviteLink.link 
+            : "Invite link off";
+
+          const name = await usersData.getName(leftID);
+
+          api.sendMessage(
+            `😹 @${name} পালাইতে পারবি না!\n😁😁\n${inviteLink}`,
+            event.threadID
+          );
+        } catch (err) {
+          console.log("Antiout Error:", err);
+        }
+      }
+    }, 5000);
+  }
 };
