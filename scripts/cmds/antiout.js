@@ -1,22 +1,66 @@
-module.exports.config = {
+module.exports = {
+  config: {
     name: "antiout",
-    version: "1.0.0",
-    credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
-    hasPermssion: 1,
-    description: "Turn off antiout",
-    usages: "antiout on/off",
-    commandCategory: "system",
-    cooldowns: 0
+    version: "6.0",
+    author: "Hasan X",
+    role: 0,
+    shortDescription: "Full Fix Anti Leave",
+    category: "boxchat",
+    guide: "{pn} on/off"
+  },
+
+  onStart: async function ({ message, event, threadsData, args }) {
+    if (!args[0]) return message.reply("Use: antiout on/off");
+
+    const status = args[0] === "on";
+    await threadsData.set(event.threadID, status, "settings.antiout");
+
+    return message.reply(`🐸 Antiout ${status ? "Enabled" : "Disabled"}`);
+  },
+
+  onEvent: async function ({ api, event, threadsData, usersData }) {
+    if (event.logMessageType !== "log:unsubscribe") return;
+
+    const status = await threadsData.get(event.threadID, "settings.antiout");
+    if (!status) return;
+
+    const leftID = event.logMessageData.leftParticipantFbId;
+    const botID = api.getCurrentUserID();
+
+    if (leftID == botID) return;
+
+    setTimeout(async () => {
+      try {
+        await api.addUserToGroup(leftID, event.threadID);
+
+        const name = await usersData.getName(leftID);
+
+        api.sendMessage({
+          body: `@${name} পালাইতে গেছিলি? আবার ধইরা আনলাম 😹\n👉 হাসানের পারমিশন ছাড়া lift নেয়া যাবে না 🐸✌️`,
+          mentions: [{
+            tag: name,
+            id: leftID
+          }]
+        }, event.threadID);
+
+      } catch (e) {
+        // যদি add না হয় → invite link
+        try {
+          const threadInfo = await api.getThreadInfo(event.threadID);
+          const inviteLink = threadInfo.inviteLink.enable 
+            ? threadInfo.inviteLink.link 
+            : "Invite link off";
+
+          const name = await usersData.getName(leftID);
+
+          api.sendMessage(
+            `😹 @${name} পালাইতে পারবি না!\nএই লিংক দিয়া আবার ঢুক 👇\n${inviteLink}`,
+            event.threadID
+          );
+        } catch (err) {
+          console.log("Antiout Error:", err);
+        }
+      }
+    }, 5000);
+  }
 };
-
-module.exports.run = async({ api, event, Threads}) => {
-    let data = (await Threads.getData(event.threadID)).data || {};
-    if (typeof data["antiout"] == "undefined" || data["antiout"] == false) data["antiout"] = true;
-    else data["antiout"] = false;
-    
-    await Threads.setData(event.threadID, { data });
-    global.data.threadData.set(parseInt(event.threadID), data);
-    
-    return api.sendMessage(`✅𝒅𝒐𝒏𝒆  ${(data["antiout"] == true) ? "turn on" : "Turn off"} successful antiout!`, event.threadID);
-
-}
