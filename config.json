@@ -48,7 +48,7 @@
     "database": {
         "type": "mongodb",
         "uriMongodb": "mongodb+srv://eryxenxdb:eryxenxdbgoatv2@cluster0.523a3n0.mongodb.net/?appName=Cluster0",
-        "autoSyncWhenStart": true,
+        "autoSyncWhenStart": false,
         "autoRefreshThreadInfoFirstTime": true,
         "notes": "Recommended using 'mongodb' or 'sqlite'."
     },
@@ -81,7 +81,7 @@
         }
     },
     "autoRestart": {
-        "time": true,
+        "time": null,
         "notes": "Example: 60000 (1min), 3600000 (1hr), 0 0 * * * (daily)."
     },
     "autoUptime": {
@@ -97,7 +97,7 @@
         "notes": "Automatically reloads scripts if edited."
     },
     "autoRefreshFbstate": true,
-    "autoReloginWhenChangeAccount": true,
+    "autoReloginWhenChangeAccount": false,
     "autoRestartWhenListenMqttError": true,
     "restartListenMqtt": {
         "enable": true,
@@ -148,10 +148,10 @@
         "updatePresence": true,
         "listenTyping": true,
         "logLevel": "error",
-        "selfListen": true,
+        "selfListen": false,
         "selfListenEvent": true,
         "autoMarkDelivery": false,
-        "autoReconnect": false,
+        "autoReconnect": true,
         "notes": "Docs: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions"
     },
     "noPrefix": {
