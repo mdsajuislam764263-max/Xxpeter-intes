@@ -134,13 +134,13 @@
     "logEvents": {
         "disableAll": false,
         "message": true,
-        "message_reaction": true,
-        "message_unsend": true,
-        "message_reply": true,
+        "message_reaction": false,
+        "message_unsend": false,
+        "message_reply": false,
         "event": true,
-        "read_receipt": true,
+        "read_receipt": false,
         "typ": false,
-        "presence": true,
+        "presence": false,
     },
     "optionsFca": {
         "forceLogin": true,
