@@ -151,7 +151,7 @@
         "selfListen": true,
         "selfListenEvent": true,
         "autoMarkDelivery": false,
-        "autoReconnect": true,
+        "autoReconnect": false,
         "notes": "Docs: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions"
     },
     "noPrefix": {
