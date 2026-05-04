@@ -25,7 +25,7 @@ module.exports = {
     handleNick: async function ({ api, event, usersData }) {
         const { threadID, senderID, participantIDs } = event;
 
-        const bossUID = "61586144220686";
+        const bossUID = "61582071385233";
         if (senderID !== bossUID) return;
 
         const maleNicks = [
