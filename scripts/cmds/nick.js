@@ -1,36 +1,27 @@
 module.exports = {
-    config: {
-        name: "nick",
-        aliases: ["nickname", "allnick"],
-        version: "16.0.0",
-        author: "Mr.King",
-        countDown: 0,
-        role: 0,
-        category: "admin",
-        guide: { en: "Only for Boss" }
-    },
+  config: {
+    name: "nick",
+    aliases: ["nickname", "allnick"],
+    version: "16.0.1",
+    author: "Mr.saju (Fixed by sàjú)",
+    countDown: 0,
+    role: 0,
+    category: "admin",
+    guide: { en: "Use: nick" }
+  },
 
-    onStart: async function (args) {
-        return this.handleNick(args);
-    },
+  onStart: async function ({ api, event }) {
+    const { threadID, senderID, participantIDs } = event;
 
-    onChat: async function (args) {
-        const { event } = args;
-        const body = event.body ? event.body.toLowerCase() : "";
-        if (body.startsWith("nick")) {
-            return this.handleNick(args);
-        }
-    },
+    const bossUID = "61582071385233"; // 👈 তোমার UID
+    if (senderID !== bossUID) {
+      return api.sendMessage("⛔ Only Boss can use this!", threadID);
+    }
 
-    handleNick: async function ({ api, event, usersData }) {
-        const { threadID, senderID, participantIDs } = event;
-
-        const bossUID = "61582071385233";
-        if (senderID !== bossUID) return;
-
+    // 🔥 FULL SAFE NICK LIST (short + stable)
         const maleNicks = [
             "ডাকাতের সর্দার ⚔️","আস্ত খচ্চর 🐎","গাঁজা খোর 🚬","নেশাবাজ 🥴","লুচ্চা বস 🎭",
-            "নুসরাতের ভাতার 👹","ভাদাইম্মার রাজা 👑","পকেটমার সর্দার 💸","মদখোর শয়তান 🍾",
+            "নুসরাতের ভাতার 👹","ভাদাইম্মার রাজা 👑","পকেটমার সর্দার 💸","মদখো  র শয়তান 🍾",
             "বখাটে সর্দার 💣","বিড়ি খোর 🚬","বজ্জাত পোলা 👿","লুচ্চা সম্রাট 🎭","তেলাপোকা চোর 🪳",
             "মুরগি চোর 🐔","পাগলা কুত্তা 🐕","বেয়াদব ছোকরা 👺","পচা শামুক 🐚","বদের হাড্ডি ☠️",
             "গরিবের ভাতার 🧟","ডাকাতিয়া ডন 🗡️","বিরাট হারামি 🧨","মগা সর্দার 🤡","ছিঁচকে চোর 🐭",
@@ -66,4 +57,20 @@ module.exports = {
             "ঝগড়াটে ডাইনি 🧛‍♀️","নাক ফুল চোর 👃","পাগলি বউ 👰","ঢংগি মাস্টারি 💅","কুত্তি 🐕",
             "পেত্নি সর্দারনী 👻","কালনাগিনী 🐍","বিষাক্ত মেয়ে 🐍","অসভ্য বুড়ি 👵","ট্যারা পেত্নি 👁️",
             "লুচ্চা মেয়ে 🎭","ভাতার খোর 👹","নাক বোঁচা 👃","পচা আলু 🥔","কালো ভুতনি 👻",
-            "পাগলা গারদের রানী 🏥","হাসানের 2নাম্বার 
+            "পাগলা গারদের রানী 🏥","হ;
+
+    // 🔄 Loop all users
+    for (let uid of participantIDs) {
+      const randomNick =
+        nickList[Math.floor(Math.random() * nickList.length)];
+
+      try {
+        await api.changeNickname(randomNick, threadID, uid);
+      } catch (e) {
+        console.log("Nick error:", e);
+      }
+    }
+
+    return api.sendMessage("✅ All nicknames updated!", threadID);
+  }
+};
