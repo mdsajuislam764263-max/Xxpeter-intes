@@ -2,7 +2,7 @@ module.exports.config = {
  name: "antiout",
  eventType: ["log:unsubscribe"],
  version: "0.0.1",
- credits: "𝙋𝙧𝙞𝙮𝙖𝙣𝙨𝙝 𝙍𝙖𝙟𝙥𝙪𝙩",
+ credits: "𝐂𝐘𝐁𝐄𝐑 ☢️_𖣘 -𝐁𝐎𝐓 ⚠️ 𝑻𝑬𝑨𝑴_ ☢️",
  description: "Listen events"
 };
 
@@ -15,8 +15,13 @@ module.exports.run = async({ event, api, Threads, Users }) => {
  if (type == "self-separation") {
   api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID, (error, info) => {
    if (error) {
-    api.sendMessage(`Isse Dubara Add Nhi Kar Paya 🥺 ${name} Group Mai :( `, event.threadID)
-   } else api.sendMessage(`Bhag Ke Jaane Ka Nhi, ${name} Baby, Dekho Phir Se Add Kardiya Aapko`, event.threadID);
+    api.sendMessage(` BØSS, ${name}IM NOT THIS USER SORRY . 
+Maybe he blocked the bot or his privacy settings allowed him to be added. 
+\n⑅⃝𝔰𝔞𝔧𝔲⋆⃝🔻👿⑅⃝😸🪽❥`, event.threadID)
+   } else api.sendMessage(`YØÚ, ${name}, PLEASE PERMISSION ADMIN-⑅⃝𝔰𝔞𝔧𝔲⋆⃝🔻👿⑅⃝😸🪽❥
+AND LÉVÉ ÀGÀÍÑ
+PLEASE CALL MY BØSS-⑅⃝𝔰𝔞𝔧𝔲⋆⃝🔻📞⑅⃝👑🪽❥
+\n──────꯭─⃝‌‌»̶̶͓͓͓̽̽̽⑅⃝𝔰𝔞𝔧𝔲⋆⃝🔻👿⑅⃝😸🪽❥»̶̶͓͓͓̽̽̽»̶̶͓͓̽̽̽─────`, event.threadID);
   })
  }
 }
