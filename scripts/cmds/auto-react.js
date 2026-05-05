@@ -19,7 +19,7 @@ module.exports = {
       // ❌ নিজের / বটের মেসেজে রিয়েক্ট না
       if (senderID === api.getCurrentUserID()) return;
 
-      // ❌ cooldown
+      // ❌ হালকা cooldown (2.5s)
       global.__autoReactCooldown ??= {};
       if (
         global.__autoReactCooldown[threadID] &&
@@ -46,34 +46,15 @@ module.exports = {
       ];
 
       // ==========================
-      // Text Triggers (UPDATED)
+      // Text Triggers
       // ==========================
       const texts = [
-        // Normal
         { k: ["haha","lol","moja","xd"], r: "😆" },
         { k: ["sad","kharap","mon kharap","cry"], r: "😢" },
         { k: ["love","valobasi","miss"], r: "❤️" },
         { k: ["rag","angry","rage"], r: "😡" },
-        { k: ["saju","@ﹺ　　　　　　　　　　　　　　　　　　　　　　　　　ﹺ ﹺ　　　　　　　　　　　　　　　　　　　　　　　　　ﹺ "], r: "👑" },
-        { k: ["ok","yes","okay","hmm"], r: "👍" },
-
-        // Islamic
-        { k: ["assalamu alaikum","আস্সালামু আলাইকুম"], r: "🤲" },
-        { k: ["walaikum salam","ওয়ালাইকুম সালাম"], r: "🕌" },
-        { k: ["alhamdulillah","আলহামদুলিল্লাহ"], r: "🤍" },
-        { k: ["inshallah","ইনশাআল্লাহ"], r: "✨" },
-        { k: ["mashallah","মাশাআল্লাহ"], r: "🌙" },
-        { k: ["subhanallah","সুবহানাল্লাহ"], r: "🌸" },
-
-        // Names / relation
-        { k: ["hasan","হাসান"], r: "😎" },
-        { k: ["tahia","তাহিয়া"], r: "😊" },
-        { k: ["janu","জানু"], r: "🥰" },
-        { k: ["mama","মামা"], r: "😂" },
-        { k: ["bhai","ভাই"], r: "🤝" },
-
-        // Bye type
-        { k: ["bye","tata","allah hafez","আল্লাহ হাফেজ"], r: "👋" }
+        { k: ["wow","omg"], r: "😮" },
+        { k: ["ok","yes","okay","hmm"], r: "👍" }
       ];
 
       // ==========================
@@ -98,21 +79,13 @@ module.exports = {
         }
       }
 
-      // ==========================
-      // RANDOM EMOJI (NEW)
-      // ==========================
-      if (!react) {
-        const randomEmoji = [
-          "😆","😂","😎","🔥","💖","🤍","✨","🥰","🤝","👀",
-          "😜","😇","🖤","🌸","🌙","💯","😈","😻","🤗","🙃"
-        ];
-        react = randomEmoji[Math.floor(Math.random() * randomEmoji.length)];
-      }
+      // ❌ কিছু না মিললে রিয়েক্ট না
+      if (!react) return;
 
-      // ⏱ delay
+      // ⏱ Human-like delay
       await new Promise(r => setTimeout(r, 800));
 
-      // ✅ react
+      // ✅ FINAL FIX — NO callback, NO true
       api.setMessageReaction(react, messageID);
 
     } catch (e) {}
