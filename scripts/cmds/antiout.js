@@ -1,22 +1,64 @@
-module.exports.config = {
+module.exports = {
+ config: {
  name: "antiout",
- eventType: ["log:unsubscribe"],
- version: "0.0.1",
- credits: "𝙋𝙧𝙞𝙮𝙖𝙣𝙨𝙝 𝙍𝙖𝙟𝙥𝙪𝙩",
- description: "Listen events"
-};
-
-module.exports.run = async({ event, api, Threads, Users }) => {
- let data = (await Threads.getData(event.threadID)).data || {};
- if (data.antiout == false) return;
- if (event.logMessageData.leftParticipantFbId == api.getCurrentUserID()) return;
- const name = global.data.userName.get(event.logMessageData.leftParticipantFbId) || await Users.getNameUser(event.logMessageData.leftParticipantFbId);
- const type = (event.author == event.logMessageData.leftParticipantFbId) ? "self-separation" : "Koi Ase Pichware Mai Lath Marta Hai?";
- if (type == "self-separation") {
-  api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID, (error, info) => {
-   if (error) {
-    api.sendMessage(`Isse Dubara Add Nhi Kar Paya 🥺 ${name} Group Mai :( `, event.threadID)
-   } else api.sendMessage(`Bhag Ke Jaane Ka Nhi, ${name} Baby, Dekho Phir Se Add Kardiya Aapko`, event.threadID);
-  })
+ version: "1.0",
+ author: "Chitron Bhattacharjee",
+ countDown: 5,
+ role: 1, // Only admin can use this command
+ shortDescription: {
+ en: "Prevent members from leaving the group"
+ },
+ longDescription: {
+ en: "Enable/disable anti-out feature that automatically adds back members who leave the group"
+ },
+ category: "admin",
+ guide: {
+ en: "{pn} [on|off] - Turn anti-out feature on or off"
  }
-}
+ },
+
+ langs: {
+ en: {
+ turnedOn: "🛡️ Anti-out feature has been enabled for this group",
+ turnedOff: "🛡️ Anti-out feature has been disabled for this group",
+ missingPermission: "❌ Sorry boss! I couldn't add the user back.\nUser %1 might have blocked me or doesn't have messenger option enabled.",
+ addedBack: "⚠️ Attention %1!\nThis group belongs to my boss!\nYou need admin clearance to leave this group!"
+ }
+ },
+
+ onStart: async function ({ args, message, event, threadsData, getLang }) {
+ if (args[0] === "on") {
+ await threadsData.set(event.threadID, true, "data.antiout");
+ message.reply(getLang("turnedOn"));
+ } 
+ else if (args[0] === "off") {
+ await threadsData.set(event.threadID, false, "data.antiout");
+ message.reply(getLang("turnedOff"));
+ }
+ else {
+ message.reply("Please specify 'on' or 'off' to enable/disable anti-out feature");
+ }
+ },
+
+ onEvent: async function ({ event, api, threadsData, usersData, getLang }) {
+ if (event.logMessageType !== "log:unsubscribe") 
+ return;
+
+ const antiout = await threadsData.get(event.threadID, "data.antiout");
+ if (!antiout) 
+ return;
+
+ if (event.logMessageData.leftParticipantFbId === api.getCurrentUserID()) 
+ return;
+
+ const name = await usersData.getName(event.logMessageData.leftParticipantFbId);
+ 
+ try {
+ await api.addUserToGroup(event.logMessageData.leftParticipantFbId, event.threadID);
+ api.sendMessage(getLang("addedBack", name), event.threadID);
+ } 
+ catch (error) {
+ api.sendMessage(getLang("missingPermission", name), event.threadID);
+ }
+ }
+};
