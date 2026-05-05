@@ -1,4 +1,4 @@
-name: Run Messenger Bot
+name: Run Bot 24/7 (Auto Restart)
 
 on:
   push:
@@ -10,16 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
+    - name: 📥 Checkout Code
       uses: actions/checkout@v3
 
-    - name: Setup Node.js
+    - name: ⚙️ Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 20
 
-    - name: Install Dependencies
-      run: npm install
+    - name: 📦 Install Dependencies
+      run: |
+        npm install
+        npm install dotenv
 
-    - name: Start Bot
-      run: node index.js
+    - name: 🚀 Start Bot with Auto Restart
+      run: |
+        echo "Starting bot with auto-restart..."
+        for i in {1..50}
+        do
+          echo "🔁 Restart attempt $i"
+          npm start
+          echo "❌ Bot crashed! Restarting in 5 sec..."
+          sleep 5
+        done
