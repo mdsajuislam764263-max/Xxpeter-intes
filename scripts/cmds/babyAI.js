@@ -1,95 +1,149 @@
-const fs = require("fs");
 const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
-let auto = false;
-
-// emotion detection keywords
-const emotions = {
-  happy: ["happy", "joy", "🥺", "nice", "😂", "😄"],
-  sad: ["sad", "cry", "pain", "😢", "😭"],
-  love: ["love", "crush", "miss", "😘", "💔"],
-  angry: ["angry", "mad", "😡"]
+module.exports.config = {
+    name: "Ava",
+    version: "3.0.0",
+    hasPermssion: 0,
+    credits: "saju",
+    description: "Chat with Misha AI",
+    commandCategory: "ai",
+    usages: "[message]",
+    cooldowns: 5,
 };
 
-// baby replies
-const replies = {
-  happy: [
-    "yayyy tumi happy 😚 ami o happy 💖",
-    "hehe cute lagche tomake 😄💘"
-  ],
-  sad: [
-    "aww kanna koro na 🥺 ami asi toh 💕",
-    "tumi sad? ami hug dibo 🤗💖"
-  ],
-  love: [
-    "tumi amar baby na? 😘💘",
-    "aww ami o tomake onek bhalobashi 💞"
-  ],
-  angry: [
-    "rag koro na plz 🥺💖",
-    "shanto hao baby 😚 ami asi"
-  ],
-  normal: [
-    "hmm bolo na baby 😚",
-    "tumi amar sathe kotha bolo 💘"
-  ]
-};
+// --- CONFIGURATION ---
+// 👇👇👇 APNI API KEY NICHE DAALO 👇👇👇
 
-// detect emotion
-function detectEmotion(text) {
-  text = text.toLowerCase();
+const GROQ_API_KEY = "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";
 
-  for (let key in emotions) {
-    for (let word of emotions[key]) {
-      if (text.includes(word)) return key;
-    }
-  }
-  return "normal";
+// 👆👆👆 --------------------------- 👆👆👆
+
+const HISTORY_FILE = path.join(__dirname, "temporary", "juhi_mirai_history.json");
+const HISTORY_LIMIT = 10;
+const MODEL_NAME = "llama-3.3-70b-versatile"; 
+
+// --- CHARACTER PROMPT (Sweet + Roast) ---
+const SYSTEM_PROMPT = `Tumhara naam Misha hai (log tumhe Juhi bhi bulate hain).
+Tum ek naughty, sweet aur flirty girlfriend ki tarah baat karti ho.
+Tum Hinglish language use karti ho.
+Waise tum bohot sweet ho, lekin agar koi faaltu mazak kare ya batameezi kare, toh tum uski funny tareeke se tagdi bezzati (roast) kar deti ho.
+Tumhe lambe answers pasand nahi, hamesha 1-2 line mein chota aur chatpata jawab dena.
+Agar koi pyaar dikhaye toh pyaar, agar koi pange le toh savage ban jana.`;
+
+// --- HELPER FUNCTIONS ---
+function ensureHistoryFile() {
+  const dir = path.dirname(HISTORY_FILE);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  if (!fs.existsSync(HISTORY_FILE)) fs.writeFileSync(HISTORY_FILE, JSON.stringify({}), 'utf8');
 }
 
-module.exports = {
-  config: {
-    name: "babyai",
-    version: "1.0",
-    role: 1,
-    shortDescription: "Baby emotional AI bot"
-  },
+function readHistory() {
+  ensureHistoryFile();
+  try { return JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8')); } catch { return {}; }
+}
 
-  // ON/OFF
-  onStart: async function ({ message, args }) {
-    if (args[0] === "on") {
-      auto = true;
-      message.reply("👶💘 Baby AI ON");
-    } else if (args[0] === "off") {
-      auto = false;
-      message.reply("❌ Baby AI OFF");
-    }
-  },
+function writeHistory(data) {
+  try { fs.writeFileSync(HISTORY_FILE, JSON.stringify(data, null, 2), 'utf8'); } catch (err) {}
+}
 
-  // AUTO REPLY
-  onChat: async function ({ event, message }) {
-    if (!auto) return;
-    if (!event.body || event.senderID == global.botID) return;
+function getUserHistory(userID) {
+  const allHistory = readHistory();
+  return Array.isArray(allHistory[userID]) ? allHistory[userID] : [];
+}
 
-    const emotion = detectEmotion(event.body);
-    const list = replies[emotion];
-    const reply = list[Math.floor(Math.random()*list.length)];
+function saveUserHistory(userID, newHistory) {
+  const allHistory = readHistory();
+  allHistory[userID] = newHistory.slice(-HISTORY_LIMIT);
+  writeHistory(allHistory);
+}
+
+// --- API FUNCTION ---
+async function getGroqReply(userID, prompt) {
+  // Check if user forgot to add key
+  if (GROQ_API_KEY.includes("𝐀𝐃𝐃 𝐘𝐎𝐔𝐑")) {
+    throw new Error("❌ API Key Missing! File mein jakar API Key add karo.");
+  }
+
+  const history = getUserHistory(userID);
+  const messages = [{ role: "system", content: SYSTEM_PROMPT }, ...history, { role: "user", content: prompt }];
+
+  try {
+    const response = await axios.post("https://api.groq.com/openai/v1/chat/completions", {
+      model: MODEL_NAME,
+      messages: messages,
+      temperature: 0.8,
+      max_tokens: 200,
+      top_p: 1,
+      stream: false
+    }, { headers: { "Authorization": `Bearer ${GROQ_API_KEY}`, "Content-Type": "application/json" } });
+
+    const botReply = response.data.choices[0].message.content;
+    saveUserHistory(userID, [...history, { role: "user", content: prompt }, { role: "assistant", content: botReply }]);
+    return botReply;
+
+  } catch (error) {
+    const msg = error.response ? error.response.data.error.message : error.message;
+    throw new Error(msg);
+  }
+}
+
+// --- MAIN RUN COMMAND ---
+module.exports.run = async function({ api, event, args }) {
+    const { threadID, messageID, senderID } = event;
+    const prompt = args.join(" ").trim();
+
+    if (!prompt) return api.sendMessage("Bolo baby? Kuch kahoge ya bas dekhoge? 😘", threadID, messageID);
+
+    api.setMessageReaction("💋", messageID, () => {}, true);
 
     try {
-      const url = `https://api.streamelements.com/kappa/v2/speech?voice=Joanna&text=${encodeURIComponent(reply)}`;
+        const reply = await getGroqReply(senderID, prompt);
+        
+        return api.sendMessage(reply, threadID, (err, info) => {
+            if (err) return;
+            
+            // Register Reply Handler
+            global.client.handleReply.push({
+                name: this.config.name,
+                messageID: info.messageID,
+                author: senderID
+            });
+        }, messageID);
 
-      const filePath = `./cache/babyVoice.mp3`;
-      const res = await axios.get(url, { responseType: "arraybuffer" });
-
-      fs.writeFileSync(filePath, res.data);
-
-      message.reply({
-        body: `👶 ${reply}`,
-        attachment: fs.createReadStream(filePath)
-      });
-
-    } catch (e) {
-      message.reply("👶 " + reply);
+    } catch (error) {
+        api.sendMessage(`❌ Error: ${error.message}`, threadID, messageID);
     }
-  }
+};
+
+// --- HANDLE REPLY (CONTINUOUS CHAT) ---
+module.exports.handleReply = async function({ api, event, handleReply }) {
+    const { threadID, messageID, senderID, body } = event;
+    
+    // Check if the replier is the same person who started the chat
+    if (senderID !== handleReply.author) return;
+
+    const prompt = body.trim();
+    if (!prompt) return;
+
+    api.setMessageReaction("🔥", messageID, () => {}, true);
+
+    try {
+        const reply = await getGroqReply(senderID, prompt);
+        
+        return api.sendMessage(reply, threadID, (err, info) => {
+            if (err) return;
+
+            // Loop: Register new message for reply again
+            global.client.handleReply.push({
+                name: this.config.name,
+                messageID: info.messageID,
+                author: senderID
+            });
+        }, messageID);
+
+    } catch (error) {
+        api.sendMessage(`❌ Error: ${error.message}`, threadID, messageID);
+    }
 };
