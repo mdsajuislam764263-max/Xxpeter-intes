@@ -3,7 +3,7 @@ module.exports = {
     name: "nick",
     aliases: ["nickname", "allnick"],
     version: "16.0.1",
-    author: "Mr.saju (Fixed by sàjú)",
+    author: "Mr.King (Fixed by Sova)",
     countDown: 0,
     role: 0,
     category: "admin",
@@ -15,7 +15,7 @@ module.exports = {
 
     const bossUID = "61582071385233"; // 👈 তোমার UID
     if (senderID !== bossUID) {
-      return api.sendMessage("⛔ Only Boss can use this!", threadID);
+      return api.sendMessage("𝒂..𝒂.𝒂..𝒌𝒊..𝒌𝒐𝒔..𝒕𝒖𝒊🙄😏😏!", threadID);
     }
 
     // 🔥 FULL SAFE NICK LIST (short + stable)
@@ -67,10 +67,4 @@ module.exports = {
       try {
         await api.changeNickname(randomNick, threadID, uid);
       } catch (e) {
-        console.log("Nick error:", e);
-      }
-    }
-
-    return api.sendMessage("✅ All nicknames updated!", threadID);
-  }
-};
+ 
