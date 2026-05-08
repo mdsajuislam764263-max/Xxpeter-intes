@@ -1,4 +1,4 @@
-const { createCanvas, loadImage } = require("canvas");
+Install wcm.js const { createCanvas, loadImage } = require("canvas");
 const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
