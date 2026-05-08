@@ -1,36 +1,27 @@
-name: Node.js CI
+const fs = require("fs");
+const { spawn } = require("child_process");
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+let bot;
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+function start() {
+    console.log("🚀 Bot starting...");
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    bot = spawn("node", ["index.js"], {
+        stdio: "inherit",
+        shell: true
+    });
 
-    steps:
-    # Step to check out the repository code
-    - uses: actions/checkout@v2
+    bot.on("close", () => {
+        console.log("♻ Bot stopped, restarting...");
+        start();
+    });
+}
 
-    # Step to set up the specified Node.js version
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
+// watch account.txt
+fs.watchFile("account.txt", () => {
+    console.log("📄 account.txt changed!");
+    if (bot) bot.kill();
+    setTimeout(start, 2000);
+});
 
-    # Step to install dependencies
-    - name: Install dependencies
-      run: npm install
-
-    # Step to run the bot with the correct port
-    - name: Start the bot
-      env:
-        PORT: 8080
-      run: npm start
+start();
