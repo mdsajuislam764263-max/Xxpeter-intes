@@ -1,100 +1,109 @@
-// pitchergame.js
-// SIMPLE PITCHER GAME - ALL CODE IN ONE FILE
+// 100% FIXED RESPONSE VERSION
 
 module.exports = {
   config: {
     name: "pitcher",
-    version: "1.0",
+    version: "2.0",
     author: "Saju",
     role: 0,
     category: "game"
   },
 
   onStart: async function () {
-    console.log("⚾ Pitcher Game Ready");
+    console.log("⚾ Pitcher Game Loaded");
+  },
+
+  handleEvent: async function (args) {
+    return module.exports.onChat(args);
   },
 
   onChat: async function ({ api, event }) {
     try {
 
-      const msg = (event.body || "").toLowerCase().trim();
+      const body = (event.body || "").trim().toLowerCase();
 
-      // START GAME
-      if (msg === "pitcher") {
+      if (!body) return;
 
-        const text =
-`⚾ PITCHER GAME ⚾
+      // OPEN GAME PANEL
+      if (
+        body === "pitcher" ||
+        body === "game" ||
+        body === "pitch"
+      ) {
 
-Choose a number:
+        return api.sendMessage(
+`╔══════════════╗
+   ⚾ PITCHER GAME ⚾
+╚══════════════╝
+
+Choose Your Ball 👇
+
 1️⃣ Fast Ball
 2️⃣ Curve Ball
 3️⃣ Fire Ball
 
-Reply:
+📌 Reply:
 pitch 1
 pitch 2
 pitch 3
-`;
-
-        return api.sendMessage(text, event.threadID);
+`,
+          event.threadID
+        );
       }
 
-      // GAME COMMAND
-      if (msg.startsWith("pitch")) {
+      // PLAY GAME
+      if (body.startsWith("pitch ")) {
 
-        const choose = msg.split(" ")[1];
+        const choose = body.split(" ")[1];
 
-        if (!choose) {
+        if (
+          choose !== "1" &&
+          choose !== "2" &&
+          choose !== "3"
+        ) {
+
           return api.sendMessage(
-            "❌ Use:\npitch 1\npitch 2\npitch 3",
+            "❌ Use Only:\npitch 1\npitch 2\npitch 3",
             event.threadID
           );
         }
 
-        const random = Math.floor(Math.random() * 3) + 1;
+        const bot = Math.floor(Math.random() * 3) + 1;
 
-        let playerMove = "";
-        let botMove = "";
+        const balls = {
+          "1": "⚡ Fast Ball",
+          "2": "🌀 Curve Ball",
+          "3": "🔥 Fire Ball"
+        };
 
-        // PLAYER MOVE
-        if (choose === "1") playerMove = "⚡ Fast Ball";
-        if (choose === "2") playerMove = "🌀 Curve Ball";
-        if (choose === "3") playerMove = "🔥 Fire Ball";
-
-        // BOT MOVE
-        if (random === 1) botMove = "⚡ Fast Ball";
-        if (random === 2) botMove = "🌀 Curve Ball";
-        if (random === 3) botMove = "🔥 Fire Ball";
-
-        // RESULT
         let result = "";
 
-        if (parseInt(choose) === random) {
+        if (parseInt(choose) === bot) {
           result = "🎉 YOU WIN!";
         } else {
           result = "💀 YOU LOSE!";
         }
 
-        const final =
-`╔════════════╗
-   ⚾ PITCHER GAME ⚾
-╚════════════╝
+        return api.sendMessage(
+`╔══════════════╗
+   ⚾ MATCH RESULT ⚾
+╚══════════════╝
 
 👤 YOU:
-${playerMove}
+${balls[choose]}
 
 🤖 BOT:
-${botMove}
+${balls[String(bot)]}
 
 🏆 RESULT:
 ${result}
-`;
-
-        return api.sendMessage(final, event.threadID);
+`,
+          event.threadID
+        );
       }
 
-    } catch (e) {
-      console.log("PITCHER GAME ERROR:", e);
+    } catch (err) {
+      console.log("PITCHER ERROR:", err);
     }
   }
 };
