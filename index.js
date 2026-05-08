@@ -1,51 +1,41 @@
 /**
- * Goat Bot Render Deployment Fix by Eren
+ * Goat Bot GitHub Deploy Ready (by 𝒔𝒂𝒋𝒖 𝒊𝒔𝒍𝒂𝒎)
  */
 
 const express = require("express");
 const { spawn } = require("child_process");
 const log = require("./logger/log.js");
-// === BIG TEXT LOG (PURE GREEN) ===
+
 console.log(`
 \x1b[32m
- █████╗ ██████╗ ██████╗ ██╗  ██╗███████╗██╗     ██╗ ██████╗ ███╗   ██╗
-██╔══██╗██╔══██╗██╔══██╗██║  ██║██╔════╝██║     ██║██╔═══██╗████╗  ██║
-███████║██████╔╝██████╔╝███████║█████╗  ██║     ██║██║   ██║██╔██╗ ██║
-██╔══██║██╔═══╝ ██╔═══╝ ██╔══██║██╔══╝  ██║     ██║██║   ██║██║╚██╗██║
-██║  ██║██║     ██║     ██║  ██║███████╗███████╗██║╚██████╔╝██║ ╚████║
-╚═╝  ╚═╝╚═╝     ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-
-                        ██╗  ██╗
-                        ╚██╗██╔╝
-                         ╚███╔╝
-                         ██╔██╗
-                        ██╔╝ ██╗
-                        ╚═╝  ╚═╝
-
-             ███████╗██████╗ ███████╗███╗   ██╗
-             ██╔════╝██╔══██╗██╔════╝████╗  ██║
-             █████╗  ██████╔╝█████╗  ██╔██╗ ██║
-             ██╔══╝  ██╔══██╗██╔══╝  ██║╚██╗██║
-             ███████╗██║  ██║███████╗██║ ╚████║
-             ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝
+█████╗ ██████╗ ██████╗  GITHUB DEPLOY READY BOT
+𝒔𝒂𝒋𝒖 𝒊𝒔𝒍𝒂𝒎 SYSTEM ACTIVE
 \x1b[0m
 `);
 
+// ================== SAFE ERROR HANDLER ==================
+process.on("uncaughtException", err => {
+	console.log("CRASH FIX:", err.message);
+});
 
-// === Express server to keep Render service alive ===
+process.on("unhandledRejection", err => {
+	console.log("PROMISE FIX:", err.message);
+});
+
+// ================== EXPRESS SERVER ==================
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-	res.send("EREN BOT RUNNING \n author: Eren \n Status: smooth 🥵");
+	res.send("Goat Bot is Running ✅ | GitHub Deploy Ready");
 });
 
 app.listen(PORT, () => {
-	console.log(`✅ Server running at http://localhost:${PORT}`);
+	console.log(`SERVER LIVE ON PORT ${PORT}`);
 });
 
-// === Start the Goat bot process ===
-function startProject() {
+// ================== AUTO START BOT ==================
+function startBot() {
 	const child = spawn("node", ["Goat.js"], {
 		cwd: __dirname,
 		stdio: "inherit",
@@ -53,11 +43,14 @@ function startProject() {
 	});
 
 	child.on("close", (code) => {
-		if (code === 2) {
-			log.info("Restarting Project...");
-			startProject();
-		}
+		console.log("BOT STOPPED:", code);
+		setTimeout(startBot, 3000); // auto restart safe
+	});
+
+	child.on("error", (err) => {
+		console.log("SPAWN ERROR:", err.message);
+		setTimeout(startBot, 5000);
 	});
 }
 
-startProject();
+startBot();
