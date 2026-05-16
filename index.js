@@ -1,28 +1,63 @@
 require("dotenv").config();
+/**
+ * Goat Bot Render Deployment Fix by Eren
+ */
 
-console.log("🚀 Bot starting...");
+const express = require("express");
+const { spawn } = require("child_process");
+const log = require("./logger/log.js");
+// === BIG TEXT LOG (PURE GREEN) ===
+console.log(`
+\x1b[32m
+ █████╗ ██████╗ ██████╗ ██╗  ██╗███████╗██╗     ██╗ ██████╗ ███╗   ██╗
+██╔══██╗██╔══██╗██╔══██╗██║  ██║██╔════╝██║     ██║██╔═══██╗████╗  ██║
+███████║██████╔╝██████╔╝███████║█████╗  ██║     ██║██║   ██║██╔██╗ ██║
+██╔══██║██╔═══╝ ██╔═══╝ ██╔══██║██╔══╝  ██║     ██║██║   ██║██║╚██╗██║
+██║  ██║██║     ██║     ██║  ██║███████╗███████╗██║╚██████╔╝██║ ╚████║
+╚═╝  ╚═╝╚═╝     ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
-process.on("uncaughtException", (err) => {
-  console.log("❌ Uncaught Error:", err.message);
+                        ██╗  ██╗
+                        ╚██╗██╔╝
+                         ╚███╔╝
+                         ██╔██╗
+                        ██╔╝ ██╗
+                        ╚═╝  ╚═╝
+
+    ███████╗ █████╗   ██╗   ██╗  ██╗   ██╗
+██╔════╝██╔══██╗  ██║   ██║  ██║   ██║
+███████╗███████║  ██║   ██║  ██║   ██║
+╚════██║██╔══██║  ██║   ██║  ██║   ██║
+███████║██║  ██║  ╚██████╔╝  ╚██████╔╝
+\x1b[0m
+`);
+
+
+// === Express server to keep Render service alive ===
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+	res.send("EREN BOT RUNNING \n author: Eren \n Status: smooth 🥵");
 });
 
-process.on("unhandledRejection", (err) => {
-  console.log("❌ Promise Error:", err);
+app.listen(PORT, () => {
+	console.log(`✅ Server running at http://localhost:${PORT}`);
 });
 
-// Example bot loop (replace with your API bot)
-function start() {
-  try {
-    console.log("✅ Bot is running...");
+// === Start the Goat bot process ===
+function startProject() {
+	const child = spawn("node", ["Goat.js"], {
+		cwd: __dirname,
+		stdio: "inherit",
+		shell: true
+	});
 
-    setInterval(() => {
-      console.log("💚 Alive:", new Date().toLocaleString());
-    }, 10000);
-
-  } catch (e) {
-    console.log("Restarting bot...");
-    setTimeout(start, 3000);
-  }
+	child.on("close", (code) => {
+		if (code === 2) {
+			log.info("Restarting Project...");
+			startProject();
+		}
+	});
 }
 
-start();
+startProject();
