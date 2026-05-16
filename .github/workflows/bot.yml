@@ -1,4 +1,4 @@
-name: Auto Restart Bot
+name: Safe Bot
 
 on:
   push:
@@ -6,45 +6,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  bot-run:
+  run:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
 
-      - name: Install Dependencies
-        run: npm install --no-audit --no-fund
+      - name: Install
+        run: npm install
 
-      - name: Start Bot with Auto Restart Loop
-        run: |
-          echo "🚀 Starting bot loop..."
-          while true; do
-            node index.js
-            EXIT_CODE=$?
-            echo "Bot stopped with code $EXIT_CODE"
-
-            if [ $EXIT_CODE -eq 0 ]; then
-              echo "Normal exit, stopping workflow."
-              break
-            else
-              echo "Crash detected, restarting in 5s..."
-              sleep 5
-            fi
-          done
+      - name: Start Bot
+        run: node index.js
         env:
           TOKEN: ${{ secrets.TOKEN }}
           PREFIX: ${{ secrets.PREFIX }}
-
-      - name: Upload Logs (if failure)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: bot-logs
-          path: .
