@@ -7,7 +7,7 @@ module.exports = {
 
       setTimeout(() => {
         api.unsendMessage(info.messageID);
-      }, 5000);
+      }, 5000000);
 
     });
 
