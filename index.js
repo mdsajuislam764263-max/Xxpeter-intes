@@ -1,48 +1,64 @@
-module.exports = {
-  config: {
-    name: "noprefix",
-    version: "2.0",
-    author: "Sàjú",
-    role: 0,
-    shortDescription: "Admin no prefix system",
-    category: "system"
-  },
+require("dotenv").config();
+/**
+ * Goat Bot Render Deployment Fix by Eren
+ */
 
-  onChat: async function ({ api, event, message, getLang, usersData }) {
+const express = require("express");
+const { spawn } = require("child_process");
+const log = require("./logger/log.js");
+// === BIG TEXT LOG (PURE GREEN) ===
+console.log(`
+\x1b[32m
+ █████╗ ██████╗ ██████╗ ██╗  ██╗███████╗██╗     ██╗ ██████╗ ███╗   ██╗
+██╔══██╗██╔══██╗██╔══██╗██║  ██║██╔════╝██║     ██║██╔═══██╗████╗  ██║
+███████║██████╔╝██████╔╝███████║█████╗  ██║     ██║██║   ██║██╔██╗ ██║
+██╔══██║██╔═══╝ ██╔═══╝ ██╔══██║██╔══╝  ██║     ██║██║   ██║██║╚██╗██║
+██║  ██║██║     ██║     ██║  ██║███████╗███████╗██║╚██████╔╝██║ ╚████║
+╚═╝  ╚═╝╚═╝     ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 
-    // 🔥 ADMIN UID
-    const adminUID = [
-      "61582071385233" // <-- Your Facebook UID
-    ];
+                        ██╗  ██╗
+                        ╚██╗██╔╝
+                         ╚███╔╝
+                         ██╔██╗
+                        ██╔╝ ██╗
+                        ╚═╝  ╚═╝
 
-    // ❌ Ignore Other Users
-    if (!adminUID.includes(event.senderID)) return;
+             ███████╗██████╗ ███████╗███╗   ██╗
+             ██╔════╝██╔══██╗██╔════╝████╗  ██║
+             █████╗  ██████╔╝█████╗  ██╔██╗ ██║
+             ██╔══╝  ██╔══██╗██╔══╝  ██║╚██╗██║
+             ███████╗██║  ██║███████╗██║ ╚████║
+             ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝
+\x1b[0m
+`);
 
-    // 📩 Message
-    const body = event.body?.trim().toLowerCase();
 
-    if (!body) return;
+// === Express server to keep Render service alive ===
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    // 📂 Load Commands
-    const commands = global.GoatBot.commands;
+app.get("/", (req, res) => {
+	res.send("EREN BOT RUNNING \n author: Eren \n Status: smooth 🥵");
+});
 
-    // 🔍 Find Command Without Prefix
-    const command = commands.get(body);
+app.listen(PORT, () => {
+	console.log(`✅ Server running at http://localhost:${PORT}`);
+});
 
-    // ✅ Run Command
-    if (command) {
-      try {
-        await command.onStart({
-          api,
-          event,
-          message,
-          args: [],
-          usersData,
-          getLang
-        });
-      } catch (e) {
-        return message.reply(`❌ Command Error:\n${e.message}`);
-      }
-    }
-  }
-};
+// === Start the Goat bot process ===
+function startProject() {
+	const child = spawn("node", ["Goat.js"], {
+		cwd: __dirname,
+		stdio: "inherit",
+		shell: true
+	});
+
+	child.on("close", (code) => {
+		if (code === 2) {
+			log.info("Restarting Project...");
+			startProject();
+		}
+	});
+}
+
+startProject();
